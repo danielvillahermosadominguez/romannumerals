@@ -1,17 +1,14 @@
 namespace romanumerals.tests
 {
     [TestFixture]
-    public class ExampleShould
+    public class RomanNumeralConverterShould
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
-
         [Test]
-        public void Doing_nothing()
+        public void Throw_exception_when_the_input_number_is_zero()
         {
-            Assert.Fail();
+            var romanNumeralConverter = new RomanNumeralConverter(0);
+
+            Assert.Throws<OutOfRange>(() => romanNumeralConverter.Convert());
         }
     }
 }
