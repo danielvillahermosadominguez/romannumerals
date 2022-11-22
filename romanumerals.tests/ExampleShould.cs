@@ -11,7 +11,7 @@ namespace romanumerals.tests
         [Test]
         public void Doing_nothing()
         {
-            Assert.Pass();
+            Assert.Fail();
         }
     }
 }
