@@ -22,20 +22,37 @@ public class RomanNumeralConverter
 
         while(rest > 0)
         {
-            KeyValuePair<int,string> ?unitDetected = null;
-            foreach (var unit in _units.Reverse())
+
+            int selectedSymbol = -1;
+            for (int i = _units.Count()-1; i >= 0 ; i--)
             {
-                if (rest >= unit.Key)
+                KeyValuePair<int, string> unit = _units.ElementAt(i);
+                if (rest >= unit.Key|| rest == unit.Key -1)
                 {
-                    unitDetected = unit;
+                    selectedSymbol = i;
                     break;
                 }
             }
 
-            if(unitDetected != null) {
-                rest -= unitDetected.Value.Key;
-                result += unitDetected.Value.Value;
-            } 
+            if(selectedSymbol >= 0) {
+                KeyValuePair<int, string> unit = _units.ElementAt(selectedSymbol);
+
+                if (rest == (unit.Key - 1))
+                {
+                    KeyValuePair<int, string> firstSymbol = _units.ElementAt(0);
+                    if(string.IsNullOrEmpty(result) || result.ElementAt(0) +"" == unit.Value)
+                    {
+                        result = firstSymbol.Value + unit.Value + result;
+                    } else
+                    {
+                        result += firstSymbol.Value + unit.Value;
+                    }
+                } else
+                {
+                   result += unit.Value;
+                }
+                rest -= unit.Key;
+            }
         }
         
         return result;
@@ -54,9 +71,7 @@ public class RomanNumeralConverter
         _units = new Dictionary<int, string>()
         {
             { 1, "I"},
-            { 4, "IV" },
             { 5, "V" },
-            { 9, "IX"},
             { 10, "X"}
         };
     }
