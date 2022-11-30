@@ -17,33 +17,33 @@ public class RomanNumeralConverter
     {
         checkOutOfRange();
 
-        if (_units.ContainsKey(_number))
-        {
-            return _units[_number];
-        }
-
         var result = "";
         var rest = _number;
-        foreach (var unit in _units.Reverse())
+
+        while(rest > 0)
         {
-            if (unit.Key == _units.Last().Key)
+            KeyValuePair<int,string> ?unitDetected = null;
+            foreach (var unit in _units.Reverse())
             {
-                while(rest > 0)
+                if (rest >= unit.Key)
                 {
-                    rest -= unit.Key;
-                    result += unit.Value;
+                    unitDetected = unit;
+                    break;
                 }
             }
-            else
-            {
-                if (rest > unit.Key)
-                {
-                    rest %= unit.Key;
-                    result += unit.Value;
-                }
-            }
+
+            if(unitDetected != null) {
+                rest -= unitDetected.Value.Key;
+                result += unitDetected.Value.Value;
+            } 
         }
+        
         return result;
+    }
+
+    private object KeyValuePair<T1, T2>()
+    {
+        throw new NotImplementedException();
     }
 
     private void checkOutOfRange()
