@@ -41,22 +41,12 @@ public class RomanNumeralConverter
         return result;
     }
 
-    private object KeyValuePair<T1, T2>()
-    {
-        throw new NotImplementedException();
-    }
-
     private void checkOutOfRange()
     {
         if (_number < MIN_RANGE || _number > MAX_RANGE)
         {
             throw new OutOfRange();
         }
-    }
-
-    private string concatISymbols(int baseNumber, int number)
-    {
-        return _units[baseNumber] + _units[number];
     }
 
     private void initializeUnits()
