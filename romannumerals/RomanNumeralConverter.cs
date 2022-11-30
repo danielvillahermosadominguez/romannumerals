@@ -22,12 +22,28 @@ public class RomanNumeralConverter
             return _units[_number];
         }
 
-        if (_number > 10)
+        var result = "";
+        var rest = _number;
+        foreach (var unit in _units.Reverse())
         {
-            return concatISymbols(10);
+            if (unit.Key == _units.Last().Key)
+            {
+                while(rest > 0)
+                {
+                    rest -= unit.Key;
+                    result += unit.Value;
+                }
+            }
+            else
+            {
+                if (rest > unit.Key)
+                {
+                    rest %= unit.Key;
+                    result += unit.Value;
+                }
+            }
         }
-
-        return concatISymbols(5);
+        return result;
     }
 
     private void checkOutOfRange()
@@ -38,9 +54,9 @@ public class RomanNumeralConverter
         }
     }
 
-    private string concatISymbols(int baseNumber)
+    private string concatISymbols(int baseNumber, int number)
     {
-        return _units[baseNumber] + _units[_number % baseNumber];
+        return _units[baseNumber] + _units[number];
     }
 
     private void initializeUnits()
@@ -48,8 +64,6 @@ public class RomanNumeralConverter
         _units = new Dictionary<int, string>()
         {
             { 1, "I"},
-            { 2, "II" },
-            { 3, "III" },
             { 4, "IV" },
             { 5, "V" },
             { 9, "IX"},
