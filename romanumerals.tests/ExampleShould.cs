@@ -24,6 +24,9 @@ namespace romanumerals.tests
         [TestCase(9, "IX")]
         [TestCase(10, "X")]
         [TestCase(11, "XI")]
+        [TestCase(12, "XII")]
+        [TestCase(13, "XIII")]
+
         public void Convert_the_number_to_a_roman_text(
             int number,
             string roman)

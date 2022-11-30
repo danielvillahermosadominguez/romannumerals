@@ -38,9 +38,9 @@ public class RomanNumeralConverter
         }
     }
 
-    private string concatISymbols(int number)
+    private string concatISymbols(int baseNumber)
     {
-        return _units[number] + _units[_number % 10];
+        return _units[baseNumber] + _units[_number % baseNumber];
     }
 
     private void initializeUnits()
