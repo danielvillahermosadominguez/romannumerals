@@ -5,7 +5,7 @@ namespace romanumerals.tests
     {
         [TestCase(0)]
         [TestCase(-1)]
-        [TestCase(3001)]
+        [TestCase(4000)]
         public void Throw_exception_when_the_input_number_is_out_of_range(int number)
         {
             var romanNumeralConverter = new RomanNumeralConverter(number);
@@ -31,13 +31,26 @@ namespace romanumerals.tests
         [TestCase(16, "XVI")]
         [TestCase(17, "XVII")]
         [TestCase(18, "XVIII")]
-        [TestCase(19, "IXX")]
+        [TestCase(19, "XIX")]
         [TestCase(20, "XX")]
-        [TestCase(29, "IXXX")]
+        [TestCase(21, "XXI")]
+        [TestCase(22, "XXII")]
+        [TestCase(28, "XXVIII")]
+        [TestCase(29, "XXIX")]
         [TestCase(30, "XXX")]
         [TestCase(26, "XXVI")]
         [TestCase(24, "XXIV")]
-        [TestCase(29, "IXXX")]
+        [TestCase(29, "XXIX")]
+        [TestCase(40, "XL")]
+        [TestCase(49, "XLIX")]
+        [TestCase(50, "L")]
+        [TestCase(90, "XC")]
+        [TestCase(150, "CL")]
+        [TestCase(500, "D")]
+        [TestCase(599, "DXCIX")]
+        [TestCase(1000, "M")]
+        [TestCase(1600, "MDC")]
+        [TestCase(3999, "MMMCMXCIX")]
         public void Convert_the_number_to_a_roman_text(
             int number,
             string roman)

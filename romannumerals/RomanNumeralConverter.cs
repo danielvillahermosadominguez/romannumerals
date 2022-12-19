@@ -2,10 +2,15 @@ namespace romanumerals;
 
 public class RomanNumeralConverter
 {
-    private const int MAX_RANGE = 3000;
-    private const int MIN_RANGE = 1;
+    private record struct Unit(int latinSymbol, String romanSymbol);
+    private List<Unit> _units;
+    private const int MaxRange = 3999;
+    private const int MinRange = 1;
+
+
+    private int _rest;
     private int _number;
-    private Dictionary<int, string> _units;
+    private string _romanNumeral;
 
     public RomanNumeralConverter(int number)
     {
@@ -17,62 +22,99 @@ public class RomanNumeralConverter
     {
         checkOutOfRange();
 
-        var result = "";
-        var rest = _number;
+        _romanNumeral = "";
+        _rest = _number;
 
-        while(rest > 0)
+        while (_rest > 0)
         {
-
-            int selectedSymbol = -1;
-            for (int i = _units.Count()-1; i >= 0 ; i--)
+            var currentUnit = GetNearestUnitToTheRest();
+            var previousUnit = getLastIncrementNotFiveAtBeginning(currentUnit);
+            var increment = 0;
+            var symbol = "";
+            if ((_rest >= (currentUnit.latinSymbol - previousUnit.latinSymbol)) && (_rest < currentUnit.latinSymbol))
             {
-                KeyValuePair<int, string> unit = _units.ElementAt(i);
-                if (rest >= unit.Key|| rest == unit.Key -1)
-                {
-                    selectedSymbol = i;
-                    break;
-                }
+                symbol =  previousUnit.romanSymbol + currentUnit.romanSymbol;
+                increment = currentUnit.latinSymbol - previousUnit.latinSymbol;
+            }
+            else
+            {
+                increment = currentUnit.latinSymbol;
+                symbol = currentUnit.romanSymbol;
             }
 
-            if(selectedSymbol >= 0) {
-                KeyValuePair<int, string> unit = _units.ElementAt(selectedSymbol);
+            _romanNumeral += symbol;
+            _rest -= increment;
+        }
 
-                if (rest == (unit.Key - 1))
-                {
-                    KeyValuePair<int, string> firstSymbol = _units.ElementAt(0);
-                    if(string.IsNullOrEmpty(result) || result.ElementAt(0) +"" == unit.Value)
-                    {
-                        result = firstSymbol.Value + unit.Value + result;
-                    } else
-                    {
-                        result += firstSymbol.Value + unit.Value;
-                    }
-                } else
-                {
-                   result += unit.Value;
-                }
-                rest -= unit.Key;
+        return _romanNumeral;
+    }
+    
+    private void initializeUnits()
+    {
+        _units = new List<Unit>()
+        {
+            new Unit(1, "I"),
+            new Unit(5, "V"),
+            new Unit(10, "X"),
+            new Unit(50, "L"),
+            new Unit(100, "C"),
+            new Unit(500, "D"),
+            new Unit(1000, "M")
+        };
+    }
+
+    private Boolean FirstDigitIsFive(int number)
+    {
+        int rest = number;
+        while (rest > 0)
+        {
+            if (rest == 5)
+            {
+                return true;
+            }
+
+            rest = rest / 10;
+        }
+
+        return false;
+    }
+
+    private Unit getLastIncrementNotFiveAtBeginning(Unit currentUnit)
+    {
+        for (int i = _units.Count() - 1; i >= 0; i--)
+        {
+            var unit = _units.ElementAt(i);
+            if ((unit.latinSymbol < currentUnit.latinSymbol) && !FirstDigitIsFive(unit.latinSymbol))
+            {
+                return unit;
             }
         }
-        
-        return result;
+
+        return _units.ElementAt(0);
+    }
+    
+    
+
+    private Unit GetNearestUnitToTheRest()
+    {
+        for (int i = _units.Count() - 1; i >= 0; i--)
+        {
+            var unit = _units.ElementAt(i);
+            var beforeUnit = getLastIncrementNotFiveAtBeginning(unit);
+            if (_rest >= unit.latinSymbol || (_rest >= unit.latinSymbol - beforeUnit.latinSymbol && _rest <unit.latinSymbol))
+            {
+                return unit;
+            }
+        }
+
+        throw new NotExistAnUnit();
     }
 
     private void checkOutOfRange()
     {
-        if (_number < MIN_RANGE || _number > MAX_RANGE)
+        if (_number < MinRange || _number > MaxRange)
         {
             throw new OutOfRange();
         }
-    }
-
-    private void initializeUnits()
-    {
-        _units = new Dictionary<int, string>()
-        {
-            { 1, "I"},
-            { 5, "V" },
-            { 10, "X"}
-        };
     }
 }
