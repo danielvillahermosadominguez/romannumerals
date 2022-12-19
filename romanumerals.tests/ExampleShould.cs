@@ -8,9 +8,9 @@ namespace romanumerals.tests
         [TestCase(4000)]
         public void Throw_exception_when_the_input_number_is_out_of_range(int number)
         {
-            var romanNumeralConverter = new RomanNumeralConverter(number);
+            var romanNumeralConverter = new RomanNumeralConverter();
 
-            Assert.Throws<OutOfRange>(() => romanNumeralConverter.Convert());
+            Assert.Throws<OutOfRange>(() => romanNumeralConverter.Convert(number));
         }
 
         [TestCase(1, "I")]
@@ -55,9 +55,9 @@ namespace romanumerals.tests
             int number,
             string roman)
         {
-            var romanNumeralConverter = new RomanNumeralConverter(number);
+            var romanNumeralConverter = new RomanNumeralConverter();
 
-            var result = romanNumeralConverter.Convert();
+            var result = romanNumeralConverter.Convert(number);
 
             Assert.That(result, Is.EqualTo(roman));
         }

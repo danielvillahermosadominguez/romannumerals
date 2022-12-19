@@ -1,118 +1,106 @@
 namespace romanumerals;
 
+record struct Symbol(int number, string roman);
+
 public class RomanNumeralConverter
 {
-    private record struct Unit(int latinSymbol, String romanSymbol);
-    private List<Unit> _units;
+    private List<Symbol> _symbols;
     private const int MaxRange = 3999;
     private const int MinRange = 1;
 
-
-    private int _rest;
-    private int _number;
-    private string _romanNumeral;
-
-    public RomanNumeralConverter(int number)
+    public RomanNumeralConverter()
     {
-        _number = number;
-        initializeUnits();
+        InitializeSymbols();
     }
 
-    public string Convert()
+    public string Convert(int number)
     {
-        checkOutOfRange();
+        CheckOutOfRange(number);
 
-        _romanNumeral = "";
-        _rest = _number;
+        var result = "";
+        var rest = number;
 
-        while (_rest > 0)
-        {
-            var currentUnit = GetNearestUnitToTheRest();
-            var previousUnit = getLastIncrementNotFiveAtBeginning(currentUnit);
-            var increment = 0;
-            var symbol = "";
-            if ((_rest >= (currentUnit.latinSymbol - previousUnit.latinSymbol)) && (_rest < currentUnit.latinSymbol))
-            {
-                symbol =  previousUnit.romanSymbol + currentUnit.romanSymbol;
-                increment = currentUnit.latinSymbol - previousUnit.latinSymbol;
-            }
-            else
-            {
-                increment = currentUnit.latinSymbol;
-                symbol = currentUnit.romanSymbol;
-            }
-
-            _romanNumeral += symbol;
-            _rest -= increment;
-        }
-
-        return _romanNumeral;
-    }
-    
-    private void initializeUnits()
-    {
-        _units = new List<Unit>()
-        {
-            new Unit(1, "I"),
-            new Unit(5, "V"),
-            new Unit(10, "X"),
-            new Unit(50, "L"),
-            new Unit(100, "C"),
-            new Unit(500, "D"),
-            new Unit(1000, "M")
-        };
-    }
-
-    private Boolean FirstDigitIsFive(int number)
-    {
-        int rest = number;
         while (rest > 0)
         {
-            if (rest == 5)
-            {
-                return true;
-            }
-
-            rest = rest / 10;
+            var currentSymbol = GetNearestSymbol(rest);
+            var precedentSymbol = GetPrecedentSymbolWith1AsFirstDigit(currentSymbol);
+            var symbol = CalculateSymbolOnTheFly(rest, currentSymbol, precedentSymbol);
+            result += symbol.roman;
+            rest -= symbol.number;
         }
 
-        return false;
+        return result;
     }
 
-    private Unit getLastIncrementNotFiveAtBeginning(Unit currentUnit)
+    private static Symbol CalculateSymbolOnTheFly(int rest, Symbol currentSymbol, Symbol precedentSymbol)
     {
-        for (int i = _units.Count() - 1; i >= 0; i--)
+        if (IsBetween(rest, currentSymbol, precedentSymbol))
         {
-            var unit = _units.ElementAt(i);
-            if ((unit.latinSymbol < currentUnit.latinSymbol) && !FirstDigitIsFive(unit.latinSymbol))
+            return new Symbol(
+                currentSymbol.number - precedentSymbol.number,
+                precedentSymbol.roman + currentSymbol.roman);
+        }
+
+        return currentSymbol;
+    }
+
+    private static bool IsBetween(int rest, Symbol currentSymbol, Symbol previousSymbol)
+    {
+        return (rest >= (currentSymbol.number - previousSymbol.number)) && (rest < currentSymbol.number);
+    }
+
+    private void InitializeSymbols()
+    {
+        _symbols = new List<Symbol>()
+        {
+            new Symbol(1, "I"),
+            new Symbol(5, "V"),
+            new Symbol(10, "X"),
+            new Symbol(50, "L"),
+            new Symbol(100, "C"),
+            new Symbol(500, "D"),
+            new Symbol(1000, "M")
+        };
+        _symbols.Reverse();
+    }
+
+    private static bool IsTheFirstDigitOne(int number)
+    {
+        var firstDigit = number / ((int)(Math.Pow(10, (int)Math.Log10(number))));
+        return firstDigit == 1;
+    }
+
+    private Symbol GetPrecedentSymbolWith1AsFirstDigit(Symbol currentSymbol)
+    {
+        foreach (var symbol in _symbols)
+        {
+            if (symbol.number < currentSymbol.number && IsTheFirstDigitOne(symbol.number))
             {
-                return unit;
+                return symbol;
             }
         }
 
-        return _units.ElementAt(0);
+        return _symbols.ElementAt(0);
     }
-    
-    
 
-    private Unit GetNearestUnitToTheRest()
+    private Symbol GetNearestSymbol(int rest)
     {
-        for (int i = _units.Count() - 1; i >= 0; i--)
+        foreach (var symbol in _symbols)
         {
-            var unit = _units.ElementAt(i);
-            var beforeUnit = getLastIncrementNotFiveAtBeginning(unit);
-            if (_rest >= unit.latinSymbol || (_rest >= unit.latinSymbol - beforeUnit.latinSymbol && _rest <unit.latinSymbol))
+            var beforeUnit = GetPrecedentSymbolWith1AsFirstDigit(symbol);
+            var lowLimit = symbol.number - beforeUnit.number;
+            if (rest >= lowLimit)
             {
-                return unit;
+                return symbol;
             }
         }
 
         throw new NotExistAnUnit();
     }
 
-    private void checkOutOfRange()
+    private static void CheckOutOfRange(int number)
     {
-        if (_number < MinRange || _number > MaxRange)
+        if (number < MinRange || number > MaxRange)
         {
             throw new OutOfRange();
         }
